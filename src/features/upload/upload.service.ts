@@ -31,6 +31,9 @@ const businessRules = `Business rules (concise, mandatory):
 Allocation-only rule:
   - If new_storage_location is blank OR equals storage_location: treat as allocation-only (do not reject the line).
 
+PT15 rule override (for this demo):
+  - If storage_location == "PT15" OR new_storage_location == "PT15": recommend sending to approval.
+
 Per-line validations: must have order, line_item, sku, qty>0; if inconsistent, exclude the line and return observations.`
 
 export async function parsearExcel(file: File): Promise<LineaSAP[]> {
@@ -115,7 +118,7 @@ export async function enviarAlAgente(
     const url = toClaudeMessagesUrl(endpoint)
     const body = {
       model: deploymentName ?? 'claude-opus-4-6',
-      max_tokens: 1024,
+      max_tokens: 2048,
       system:
         `${agentInstruction} Always answer in English. ` +
         `Output must be a single valid json object. Do not output markdown or extra text.`,
@@ -256,6 +259,6 @@ function buildPrompt(lineas: LineaValidada[], contexto: { cliente: string; horaL
     JSON.stringify(payload),
     'Return a single json object with exactly this shape:',
     '{"summary":"...","lines":[{"sales_order":"...","line_item":"...","recommendation":"...","insights":"..."}]}',
-    'Rules: include every input line exactly once; keep values short; no markdown; no surrounding text.',
+    'Rules: include every input line exactly once; keep recommendation <= 90 chars and insights <= 140 chars; no markdown; no surrounding text.',
   ].join('\n\n')
 }

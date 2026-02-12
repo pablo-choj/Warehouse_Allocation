@@ -22,22 +22,25 @@ export function validarLineas(lineas: LineaSAP[]): LineaValidada[] {
     if (!linea.sku) {
       observaciones.push('Missing SKU')
     }
-    if (linea.cantidad <= 0) {
-      observaciones.push('Quantity must be > 0')
+    if (!Number.isFinite(linea.cantidad) || linea.cantidad <= 0) {
+      observaciones.push('Quantity must be a number > 0')
     }
     // Destination can be blank or equal to origin for allocation-only scenarios.
     // We validate only core fields here and classify the scenario in recommendation text.
     const esValida = observaciones.length === 0
     let recomendacion: string
 
+    const origin = (linea.almacenOrigen ?? '').trim().toUpperCase()
+    const dest = (linea.almacenDestinoDeseado ?? '').trim().toUpperCase()
+
     if (!esValida) {
       recomendacion = `Flagged: ${observaciones.join('; ')}`
-    } else if (!linea.almacenDestinoDeseado || linea.almacenDestinoDeseado === linea.almacenOrigen) {
-      recomendacion = 'Allocation only: no warehouse change requested'
-    } else if (linea.almacenDestinoDeseado === 'PT15') {
-      recomendacion = 'Approval required: create approval ticket + allocation ticket'
-    } else if (linea.almacenDestinoDeseado === 'PT11') {
+    } else if (origin === 'PT11' || dest === 'PT11') {
       recomendacion = 'Allocation only: do not create approval ticket'
+    } else if (origin === 'PT15' || dest === 'PT15') {
+      recomendacion = 'Approval required: create approval ticket + allocation ticket'
+    } else if (!dest || dest === origin) {
+      recomendacion = 'Allocation only: no warehouse change requested'
     } else {
       recomendacion = 'Allowed: warehouse change / allocation, open ticket with Stock Management'
     }
@@ -120,7 +123,11 @@ export function construirSolicitud(
 }
 
 function inferirAccion(lineas: LineaSAP[]): Solicitud['accionSugerida'] {
-  const requiereCambioAlmacen = lineas.some((l) => l.almacenDestinoDeseado !== l.almacenOrigen)
+  const requiereCambioAlmacen = lineas.some((l) => {
+    const dest = (l.almacenDestinoDeseado ?? '').trim()
+    if (!dest) return false
+    return dest !== (l.almacenOrigen ?? '').trim()
+  })
   const requiereAlocacion = lineas.some((l) => l.cantidad > 0)
   if (requiereCambioAlmacen && requiereAlocacion) return 'Ambas'
   if (requiereCambioAlmacen) return 'Cambio de almacén'
