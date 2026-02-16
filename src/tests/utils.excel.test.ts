@@ -51,7 +51,7 @@ describe('utils/excel', () => {
   })
 
   it('retorna sample cuando no hay datos', async () => {
-    const rows = await parseExcelFile(makeFile('', 'empty.json'))
+    const rows = await parseExcelFile(makeFile(''))
     expect(rows.length).toBeGreaterThan(0)
   })
 })

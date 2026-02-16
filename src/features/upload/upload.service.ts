@@ -1,4 +1,4 @@
-import type { LineaSAP, Solicitud } from '../../types/solicitudes'
+import type { LineaSAP } from '../../types/solicitudes'
 import { parseExcelFile } from '../../utils/excel'
 import { construirSolicitud, validarLineas, type ResultadoReglas, type LineaValidada } from './upload.rules'
 import { http } from '../../lib/fetch'
@@ -10,7 +10,7 @@ export type SimulacionPayload = {
   horaLocalChile: string
 }
 
-const endpoint = env.required('VITE_VALIDATION_ENDPOINT')
+const endpoint = String(env.required('VITE_VALIDATION_ENDPOINT'))
 const deploymentName = env.get('VITE_VALIDATION_DEPLOYMENT')
 const agentInstruction =
   env.get('VITE_AGENT_INSTRUCTION') ?? 'You are an AI assistant that helps people find information.'
@@ -203,7 +203,7 @@ function tryParseAgentResponse(text: string): AgentResponse | undefined {
     if (!Array.isArray(obj.lines)) return undefined
 
     const lines: AgentLineRecommendation[] = obj.lines
-      .filter((l): l is Partial<AgentLineRecommendation> => !!l && typeof l === 'object')
+      .filter((l) => !!l && typeof l === 'object')
       .map((l) => ({
         sales_order: String(l.sales_order ?? ''),
         line_item: String(l.line_item ?? ''),
