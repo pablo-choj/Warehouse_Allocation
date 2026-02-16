@@ -8,10 +8,4 @@
       "destination": "/index.html"
     }
   ],
-  "env": {
-    "VITE_VALIDATION_ENDPOINT": "@vite_validation_endpoint",
-    "VITE_VALIDATION_DEPLOYMENT": "@vite_validation_deployment",
-    "VITE_AGENT_INSTRUCTION": "@vite_agent_instruction",
-    "VITE_REASONING_EFFORT": "@vite_reasoning_effort"
-  }
 }
