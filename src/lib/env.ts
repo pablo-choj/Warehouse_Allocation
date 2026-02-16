@@ -37,7 +37,7 @@ function bool(key: string, fallback = false) {
   if (value === undefined) {
     return fallback
   }
-  return ['1', 'true', 'yes'].includes(value.toLowerCase())
+  return typeof value === 'string' && ['1', 'true', 'yes'].includes(value.toLowerCase())
 }
 
 export const env = {

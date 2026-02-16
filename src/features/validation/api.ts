@@ -22,7 +22,7 @@ type AzureResponsePayload = {
   output_text?: string[]
 }
 
-const endpoint = env.required('VITE_VALIDATION_ENDPOINT')
+const endpoint = String(env.required('VITE_VALIDATION_ENDPOINT'))
 const agentName = env.get('VITE_AGENT_NAME') ?? 'Order-to-Cash'
 const agentInstruction =
   env.get('VITE_AGENT_INSTRUCTION') ?? 'You are an AI assistant that helps people find information.'
