@@ -7,5 +7,5 @@
       "source": "/(.*)",
       "destination": "/index.html"
     }
-  ],
+  ]
 }
